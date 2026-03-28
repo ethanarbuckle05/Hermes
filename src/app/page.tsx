@@ -110,17 +110,24 @@ export default function HomePage() {
 
   async function handleCreateWorkout(form: WorkoutFormData) {
     const totalSeconds = form.duration_minutes * 60 + form.duration_seconds;
+    const groupId = form.group_id && form.group_id.length > 0 ? form.group_id : null;
 
-    const { error } = await supabase.from("workouts").insert({
+    const payload: Record<string, unknown> = {
       user_id: userId,
       race_id: race?.id ?? null,
-      group_id: form.group_id || null,
       date: form.date,
       distance_miles: form.distance_miles,
       duration_seconds: totalSeconds,
       workout_type: form.workout_type,
       notes: form.notes || null,
-    });
+    };
+    // Only include group_id if the column exists (avoids insert errors
+    // if the groups migration hasn't been run yet)
+    if (groupId) {
+      payload.group_id = groupId;
+    }
+
+    const { error } = await supabase.from("workouts").insert(payload);
 
     if (error) throw new Error(error.message);
     setView("idle");
@@ -130,6 +137,7 @@ export default function HomePage() {
   async function handleUpdateWorkout(form: WorkoutFormData) {
     if (!editing) return;
     const totalSeconds = form.duration_minutes * 60 + form.duration_seconds;
+    const groupId = form.group_id && form.group_id.length > 0 ? form.group_id : null;
 
     const { error } = await supabase
       .from("workouts")
@@ -139,7 +147,7 @@ export default function HomePage() {
         duration_seconds: totalSeconds,
         workout_type: form.workout_type,
         notes: form.notes || null,
-        group_id: form.group_id || null,
+        ...(groupId !== null ? { group_id: groupId } : {}),
       })
       .eq("id", editing.id);
 
