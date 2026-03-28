@@ -93,16 +93,18 @@ export default function GroupsPage() {
 
     if (insertErr) { setError(insertErr.message); setSaving(false); return; }
 
-    // Auto-add creator as member
-    await supabase.from("group_members").insert({
+    // Auto-add creator as member — must succeed before re-fetching
+    const { error: memberErr } = await supabase.from("group_members").insert({
       group_id: group.id,
       user_id: userId,
     });
 
+    if (memberErr) { setError(memberErr.message); setSaving(false); return; }
+
     setNewName("");
     setShowCreate(false);
     setSaving(false);
-    fetchData();
+    await fetchData();
   }
 
   async function handleJoin(e: React.FormEvent) {
@@ -138,7 +140,7 @@ export default function GroupsPage() {
     setJoinCode("");
     setShowJoin(false);
     setSaving(false);
-    fetchData();
+    await fetchData();
   }
 
   async function handleSignOut() {
