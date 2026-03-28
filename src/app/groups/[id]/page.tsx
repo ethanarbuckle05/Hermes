@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Group, Workout, WORKOUT_COLORS, WORKOUT_LABELS } from "@/lib/types";
 import { formatDate, formatDuration, formatPace } from "@/lib/utils";
 import Nav from "@/components/Nav";
-import { useCallback, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 interface MemberStats {
   user_id: string;
@@ -21,6 +21,7 @@ interface GroupWorkout extends Workout {
 export default function GroupDetailPage() {
   const supabase = createClient();
   const params = useParams();
+  const router = useRouter();
   const groupId = params.id as string;
 
   const [group, setGroup] = useState<Group | null>(null);
@@ -28,7 +29,13 @@ export default function GroupDetailPage() {
   const [workouts, setWorkouts] = useState<GroupWorkout[]>([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState("");
+  const [userId, setUserId] = useState("");
   const [copied, setCopied] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmingLeave, setConfirmingLeave] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameValue, setNameValue] = useState("");
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const fetchData = useCallback(async () => {
     const {
@@ -36,8 +43,8 @@ export default function GroupDetailPage() {
     } = await supabase.auth.getUser();
     if (!user) return;
     setUserEmail(user.email ?? "");
+    setUserId(user.id);
 
-    // Get group info
     const { data: g } = await supabase
       .from("groups")
       .select("*")
@@ -46,8 +53,8 @@ export default function GroupDetailPage() {
 
     if (!g) { setLoading(false); return; }
     setGroup(g as Group);
+    setNameValue(g.name);
 
-    // Get members
     const { data: memberRows } = await supabase
       .from("group_members")
       .select("user_id")
@@ -57,7 +64,6 @@ export default function GroupDetailPage() {
 
     const memberIds = memberRows.map((m: { user_id: string }) => m.user_id);
 
-    // Get all workouts tagged with this group
     const { data: groupWorkouts } = await supabase
       .from("workouts")
       .select("*")
@@ -65,40 +71,26 @@ export default function GroupDetailPage() {
       .order("date", { ascending: false })
       .order("created_at", { ascending: false });
 
-    // Get member emails via their workouts or a lookup
-    // We'll build email map from all workouts by these members
     const { data: allMemberWorkouts } = await supabase
       .from("workouts")
       .select("user_id, distance_miles, date")
       .in("user_id", memberIds);
 
-    // Get emails - query auth users through a workaround:
-    // We'll use the group_members + workouts to derive emails
-    // For now, we'll get emails from the profiles or from workout ownership
-    // Since we can't query auth.users directly, we'll use a map
     const emailMap: Record<string, string> = {};
 
-    // Try to get emails from the group workouts' user info
-    // We'll fetch each member's email through auth
     for (const mid of memberIds) {
-      // Use admin-level query workaround - check if this is the current user
       if (mid === user.id) {
         emailMap[mid] = user.email ?? mid.slice(0, 8);
       } else {
-        // For other users, we store a placeholder; in production use a profiles table
         emailMap[mid] = mid.slice(0, 8) + "...";
       }
     }
 
-    // Try to get better email data from a profiles approach
-    // Check if there's user metadata in the workouts context
-    // For MVP, let's query for any workout notes or identifiable data
     const { data: memberProfiles } = await supabase
       .from("group_members")
       .select("user_id, profiles:user_id(email)")
       .eq("group_id", groupId);
 
-    // If profiles join worked, use those emails
     if (memberProfiles) {
       for (const mp of memberProfiles) {
         const profile = mp.profiles as any;
@@ -108,7 +100,6 @@ export default function GroupDetailPage() {
       }
     }
 
-    // Calculate 7-day stats per member
     const now = new Date();
     const weekAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
 
@@ -124,11 +115,9 @@ export default function GroupDetailPage() {
       };
     });
 
-    // Sort by miles descending for leaderboard
     memberStats.sort((a, b) => b.week_miles - a.week_miles);
     setMembers(memberStats);
 
-    // Map workouts with emails
     const mappedWorkouts: GroupWorkout[] = ((groupWorkouts ?? []) as Workout[]).map((w) => ({
       ...w,
       user_email: emailMap[w.user_id] ?? w.user_id.slice(0, 8),
@@ -153,6 +142,49 @@ export default function GroupDetailPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
+
+  async function handleDeleteGroup() {
+    if (!confirmingDelete) {
+      setConfirmingDelete(true);
+      return;
+    }
+    await supabase.from("groups").delete().eq("id", groupId);
+    router.push("/groups");
+  }
+
+  async function handleLeaveGroup() {
+    if (!confirmingLeave) {
+      setConfirmingLeave(true);
+      return;
+    }
+    await supabase
+      .from("group_members")
+      .delete()
+      .eq("group_id", groupId)
+      .eq("user_id", userId);
+    router.push("/groups");
+  }
+
+  function startEditingName() {
+    if (!group || group.created_by !== userId) return;
+    setEditingName(true);
+    setTimeout(() => nameInputRef.current?.focus(), 0);
+  }
+
+  async function saveName() {
+    setEditingName(false);
+    if (!group || !nameValue.trim() || nameValue.trim() === group.name) {
+      setNameValue(group?.name ?? "");
+      return;
+    }
+    await supabase
+      .from("groups")
+      .update({ name: nameValue.trim() })
+      .eq("id", groupId);
+    setGroup({ ...group, name: nameValue.trim() });
+  }
+
+  const isCreator = group?.created_by === userId;
 
   if (loading) {
     return (
@@ -179,12 +211,31 @@ export default function GroupDetailPage() {
         <div className="flex items-start justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-widest text-earth-muted">Group</p>
-            <h2 className="text-lg font-semibold mt-1">{group.name}</h2>
+            {editingName ? (
+              <input
+                ref={nameInputRef}
+                type="text"
+                value={nameValue}
+                onChange={(e) => setNameValue(e.target.value)}
+                onBlur={saveName}
+                onKeyDown={(e) => { if (e.key === "Enter") saveName(); if (e.key === "Escape") { setEditingName(false); setNameValue(group.name); } }}
+                className="text-lg font-semibold mt-1 bg-transparent border-b border-earth-border
+                           focus:outline-none focus:border-earth-sage w-full text-earth-text"
+              />
+            ) : (
+              <h2
+                className={`text-lg font-semibold mt-1 ${isCreator ? "cursor-pointer hover:text-earth-sage transition-colors" : ""}`}
+                onClick={startEditingName}
+                title={isCreator ? "Click to rename" : undefined}
+              >
+                {group.name}
+              </h2>
+            )}
           </div>
           <button
             onClick={copyInviteCode}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono tracking-widest
-                       border border-earth-border rounded hover:bg-earth-bg transition-colors"
+                       border border-earth-border rounded hover:bg-earth-bg transition-colors shrink-0"
             title="Copy invite code"
           >
             {group.invite_code}
@@ -194,6 +245,35 @@ export default function GroupDetailPage() {
         <p className="text-xs text-earth-muted mt-2">
           {members.length} {members.length === 1 ? "member" : "members"}
         </p>
+
+        {/* Delete / Leave */}
+        <div className="mt-3 pt-3 border-t border-earth-border">
+          {isCreator ? (
+            <button
+              onClick={handleDeleteGroup}
+              onBlur={() => setConfirmingDelete(false)}
+              className={`text-xs transition-colors ${
+                confirmingDelete
+                  ? "text-red-700"
+                  : "text-earth-muted hover:text-red-700"
+              }`}
+            >
+              {confirmingDelete ? "Click again to delete" : "Delete group"}
+            </button>
+          ) : (
+            <button
+              onClick={handleLeaveGroup}
+              onBlur={() => setConfirmingLeave(false)}
+              className={`text-xs transition-colors ${
+                confirmingLeave
+                  ? "text-red-700"
+                  : "text-earth-muted hover:text-red-700"
+              }`}
+            >
+              {confirmingLeave ? "Click again to leave" : "Leave group"}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Weekly leaderboard */}

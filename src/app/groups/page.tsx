@@ -29,6 +29,7 @@ export default function GroupsPage() {
   const [joinCode, setJoinCode] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     const {
@@ -38,7 +39,6 @@ export default function GroupsPage() {
     setUserId(user.id);
     setUserEmail(user.email ?? "");
 
-    // Get user's group memberships
     const { data: memberships } = await supabase
       .from("group_members")
       .select("group_id")
@@ -52,7 +52,6 @@ export default function GroupsPage() {
         .in("id", groupIds);
 
       if (g) {
-        // Get member counts
         const withCounts = await Promise.all(
           (g as Group[]).map(async (group) => {
             const { count } = await supabase
@@ -64,6 +63,8 @@ export default function GroupsPage() {
         );
         setGroups(withCounts);
       }
+    } else {
+      setGroups([]);
     }
 
     setLoading(false);
@@ -93,7 +94,6 @@ export default function GroupsPage() {
 
     if (insertErr) { setError(insertErr.message); setSaving(false); return; }
 
-    // Auto-add creator as member — must succeed before re-fetching
     const { error: memberErr } = await supabase.from("group_members").insert({
       group_id: group.id,
       user_id: userId,
@@ -121,7 +121,6 @@ export default function GroupsPage() {
 
     if (!group) { setError("Invalid invite code"); setSaving(false); return; }
 
-    // Check if already a member
     const { data: existing } = await supabase
       .from("group_members")
       .select("id")
@@ -140,6 +139,16 @@ export default function GroupsPage() {
     setJoinCode("");
     setShowJoin(false);
     setSaving(false);
+    await fetchData();
+  }
+
+  async function handleDeleteGroup(id: string) {
+    if (confirmingDelete !== id) {
+      setConfirmingDelete(id);
+      return;
+    }
+    await supabase.from("groups").delete().eq("id", id);
+    setConfirmingDelete(null);
     await fetchData();
   }
 
@@ -269,24 +278,41 @@ export default function GroupsPage() {
       ) : (
         <div className="space-y-2">
           {groups.map((g) => (
-            <Link
-              key={g.id}
-              href={`/groups/${g.id}`}
-              className="block bg-earth-card border border-earth-border rounded-lg px-4 py-3
-                         hover:border-earth-tan/40 transition-colors"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-semibold">{g.name}</h3>
-                  <p className="text-xs text-earth-muted mt-0.5">
-                    {g.member_count} {g.member_count === 1 ? "member" : "members"}
-                  </p>
+            <div key={g.id} className="relative">
+              <Link
+                href={`/groups/${g.id}`}
+                className="block bg-earth-card border border-earth-border rounded-lg px-4 py-3
+                           hover:border-earth-tan/40 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold">{g.name}</h3>
+                    <p className="text-xs text-earth-muted mt-0.5">
+                      {g.member_count} {g.member_count === 1 ? "member" : "members"}
+                    </p>
+                  </div>
+                  <span className="text-xs font-mono text-earth-muted tracking-widest pr-6">
+                    {g.invite_code}
+                  </span>
                 </div>
-                <span className="text-xs font-mono text-earth-muted tracking-widest">
-                  {g.invite_code}
-                </span>
-              </div>
-            </Link>
+              </Link>
+              {g.created_by === userId && (
+                <button
+                  onClick={(e) => { e.preventDefault(); handleDeleteGroup(g.id); }}
+                  onBlur={() => setConfirmingDelete(null)}
+                  className={`absolute top-3 right-3 p-1 rounded transition-colors ${
+                    confirmingDelete === g.id
+                      ? "text-red-700"
+                      : "text-earth-muted hover:text-red-700"
+                  }`}
+                  title={confirmingDelete === g.id ? "Click again to confirm" : "Delete group"}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}
