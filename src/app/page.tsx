@@ -1,8 +1,9 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { Race, RaceFormData, Workout, WorkoutFormData } from "@/lib/types";
+import { Group, Race, RaceFormData, Workout, WorkoutFormData } from "@/lib/types";
 import { formatDuration } from "@/lib/utils";
+import Nav from "@/components/Nav";
 import RaceCard from "@/components/RaceCard";
 import RaceForm from "@/components/RaceForm";
 import WorkoutForm from "@/components/WorkoutForm";
@@ -16,13 +17,14 @@ export default function HomePage() {
 
   const [race, setRace] = useState<Race | null>(null);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>("idle");
   const [editing, setEditing] = useState<Workout | null>(null);
   const [userEmail, setUserEmail] = useState("");
   const [userId, setUserId] = useState("");
 
-  // ─── Fetch ───────────────────────────────────────────
+  // ─── Fetch ──────────────────��────────────────────────
 
   const fetchData = useCallback(async () => {
     const {
@@ -41,7 +43,6 @@ export default function HomePage() {
       .limit(10);
 
     if (races && races.length > 0) {
-      // Prefer upcoming race, fall back to most recent past one
       const upcoming = races.find(
         (r: Race) => new Date(r.race_date + "T23:59:59") >= new Date()
       );
@@ -57,6 +58,22 @@ export default function HomePage() {
       .order("created_at", { ascending: false });
 
     if (w) setWorkouts(w as Workout[]);
+
+    // Get user's groups
+    const { data: memberships } = await supabase
+      .from("group_members")
+      .select("group_id")
+      .eq("user_id", user.id);
+
+    if (memberships && memberships.length > 0) {
+      const groupIds = memberships.map((m: { group_id: string }) => m.group_id);
+      const { data: g } = await supabase
+        .from("groups")
+        .select("*")
+        .in("id", groupIds);
+      if (g) setGroups(g as Group[]);
+    }
+
     setLoading(false);
   }, [supabase]);
 
@@ -89,7 +106,7 @@ export default function HomePage() {
     fetchData();
   }
 
-  // ─── Workout CRUD ────────────────────────────────────
+  // ─── Workout CRUD ───────────────────���────────────────
 
   async function handleCreateWorkout(form: WorkoutFormData) {
     const totalSeconds = form.duration_minutes * 60 + form.duration_seconds;
@@ -97,6 +114,7 @@ export default function HomePage() {
     const { error } = await supabase.from("workouts").insert({
       user_id: userId,
       race_id: race?.id ?? null,
+      group_id: form.group_id || null,
       date: form.date,
       distance_miles: form.distance_miles,
       duration_seconds: totalSeconds,
@@ -121,6 +139,7 @@ export default function HomePage() {
         duration_seconds: totalSeconds,
         workout_type: form.workout_type,
         notes: form.notes || null,
+        group_id: form.group_id || null,
       })
       .eq("id", editing.id);
 
@@ -153,7 +172,7 @@ export default function HomePage() {
 
   const totalMiles = workouts.reduce((s, w) => s + Number(w.distance_miles), 0);
 
-  // ─── Render ──────────────────────────────────────────
+  // ─── Render ────────���─────────────────────────────────
 
   if (loading) {
     return (
@@ -165,19 +184,7 @@ export default function HomePage() {
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8 pb-24">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl tracking-tight">Hermes</h1>
-          <p className="text-xs text-earth-muted mt-0.5">{userEmail}</p>
-        </div>
-        <button
-          onClick={handleSignOut}
-          className="text-xs text-earth-muted hover:text-earth-text transition-colors"
-        >
-          Sign out
-        </button>
-      </div>
+      <Nav userEmail={userEmail} onSignOut={handleSignOut} />
 
       {/* Race section */}
       {race ? (
@@ -231,6 +238,7 @@ export default function HomePage() {
             onSubmit={handleCreateWorkout}
             onCancel={() => setView("idle")}
             submitLabel="Log it"
+            groups={groups}
           />
         </div>
       ) : view === "edit-workout" && editing ? (
@@ -244,10 +252,12 @@ export default function HomePage() {
               duration_seconds: editing.duration_seconds % 60,
               workout_type: editing.workout_type,
               notes: editing.notes ?? "",
+              group_id: (editing as any).group_id ?? "",
             }}
             onSubmit={handleUpdateWorkout}
             onCancel={() => { setEditing(null); setView("idle"); }}
             submitLabel="Update"
+            groups={groups}
           />
         </div>
       ) : view !== "add-race" ? (

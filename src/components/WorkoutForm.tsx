@@ -1,6 +1,6 @@
 "use client";
 
-import { WorkoutFormData, WorkoutType, WORKOUT_LABELS } from "@/lib/types";
+import { Group, WorkoutFormData, WorkoutType, WORKOUT_LABELS } from "@/lib/types";
 import { todayISO } from "@/lib/utils";
 import { useState } from "react";
 
@@ -9,11 +9,12 @@ interface Props {
   onSubmit: (data: WorkoutFormData) => Promise<void>;
   onCancel?: () => void;
   submitLabel?: string;
+  groups?: Group[];
 }
 
 const TYPES: WorkoutType[] = ["easy", "long_run", "workout", "recovery", "race", "other"];
 
-export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel = "Save" }: Props) {
+export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel = "Save", groups }: Props) {
   const [form, setForm] = useState<WorkoutFormData>({
     date: initial?.date ?? todayISO(),
     distance_miles: initial?.distance_miles ?? 0,
@@ -21,6 +22,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
     duration_seconds: initial?.duration_seconds ?? 0,
     workout_type: initial?.workout_type ?? "easy",
     notes: initial?.notes ?? "",
+    group_id: initial?.group_id ?? "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -131,6 +133,25 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
           ))}
         </div>
       </div>
+
+      {/* Group (optional) */}
+      {groups && groups.length > 0 && (
+        <div>
+          <label className="block text-xs text-earth-muted mb-1.5">
+            Group <span className="text-earth-border">(optional)</span>
+          </label>
+          <select
+            value={form.group_id}
+            onChange={(e) => set("group_id", e.target.value)}
+            className={inputClass}
+          >
+            <option value="">None</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>{g.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Notes */}
       <div>

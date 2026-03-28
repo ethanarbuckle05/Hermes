@@ -14,6 +14,7 @@ export interface Workout {
   id: string;
   user_id: string;
   race_id: string | null;
+  group_id: string | null;
   date: string;
   distance_miles: number;
   duration_seconds: number;
@@ -23,6 +24,21 @@ export interface Workout {
   updated_at: string;
 }
 
+export interface Group {
+  id: string;
+  name: string;
+  created_by: string;
+  invite_code: string;
+  created_at: string;
+}
+
+export interface GroupMember {
+  id: string;
+  group_id: string;
+  user_id: string;
+  joined_at: string;
+}
+
 export interface WorkoutFormData {
   date: string;
   distance_miles: number;
@@ -30,6 +46,7 @@ export interface WorkoutFormData {
   duration_seconds: number;
   workout_type: WorkoutType;
   notes: string;
+  group_id: string;
 }
 
 export interface RaceFormData {
