@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -48,7 +49,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4 relative">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-xs">
         <div className="text-center mb-12">
           <h1 className="text-3xl tracking-tight">Hermes</h1>
@@ -67,7 +71,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2.5 border border-earth-border rounded text-sm
-                         focus:outline-none focus:border-earth-text bg-white"
+                         focus:outline-none focus:border-earth-text bg-earth-input text-earth-text"
               placeholder="you@email.com"
             />
           </div>
@@ -84,7 +88,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2.5 border border-earth-border rounded text-sm
-                         focus:outline-none focus:border-earth-text bg-white"
+                         focus:outline-none focus:border-earth-text bg-earth-input text-earth-text"
               placeholder="••••••••"
             />
           </div>

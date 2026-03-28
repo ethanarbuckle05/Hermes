@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ThemeToggle from "./ThemeToggle";
 
 interface Props {
   userEmail: string;
@@ -17,7 +18,7 @@ export default function Nav({ userEmail, onSignOut }: Props) {
         <h1 className="text-2xl tracking-tight">Hermes</h1>
         <p className="text-xs text-earth-muted mt-0.5">{userEmail}</p>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <nav className="flex gap-1 text-sm">
           <Link
             href="/"
@@ -40,6 +41,7 @@ export default function Nav({ userEmail, onSignOut }: Props) {
             Groups
           </Link>
         </nav>
+        <ThemeToggle />
         <button
           onClick={onSignOut}
           className="text-xs text-earth-muted hover:text-earth-text transition-colors"

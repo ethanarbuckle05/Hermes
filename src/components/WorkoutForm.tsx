@@ -52,8 +52,8 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
   }
 
   const inputClass =
-    "w-full px-3 py-2 border border-earth-border rounded text-sm bg-white " +
-    "focus:outline-none focus:border-earth-text";
+    "w-full px-3 py-2 border border-earth-border rounded text-sm bg-earth-input " +
+    "focus:outline-none focus:border-earth-text text-earth-text";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -125,7 +125,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
               className={`px-3 py-1.5 text-xs rounded border transition-colors ${
                 form.workout_type === t
                   ? "bg-earth-sage text-white border-earth-sage"
-                  : "bg-white text-earth-muted border-earth-border hover:border-earth-tan"
+                  : "bg-earth-card text-earth-muted border-earth-border hover:border-earth-tan"
               }`}
             >
               {WORKOUT_LABELS[t]}

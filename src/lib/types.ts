@@ -68,12 +68,12 @@ export const WORKOUT_LABELS: Record<WorkoutType, string> = {
 };
 
 export const WORKOUT_COLORS: Record<WorkoutType, string> = {
-  easy: "bg-[#E8EDE4] text-[#4A5940]",
-  long_run: "bg-[#EDE6DC] text-[#6B5B45]",
-  workout: "bg-[#E4E8DC] text-[#5A6348]",
-  recovery: "bg-[#EDE0DC] text-[#7A5A50]",
-  race: "bg-[#E0DED8] text-[#5C5A52]",
-  other: "bg-[#E8E6E2] text-[#6A6860]",
+  easy: "badge-easy",
+  long_run: "badge-long-run",
+  workout: "badge-workout",
+  recovery: "badge-recovery",
+  race: "badge-race",
+  other: "badge-other",
 };
 
 /** Standard race distance presets in miles */

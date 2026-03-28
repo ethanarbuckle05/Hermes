@@ -147,8 +147,8 @@ export default function GroupsPage() {
   }
 
   const inputClass =
-    "w-full px-3 py-2 border border-earth-border rounded text-sm bg-white " +
-    "focus:outline-none focus:border-earth-text";
+    "w-full px-3 py-2 border border-earth-border rounded text-sm bg-earth-input " +
+    "focus:outline-none focus:border-earth-text text-earth-text";
 
   if (loading) {
     return (

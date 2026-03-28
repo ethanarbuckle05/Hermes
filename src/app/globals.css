@@ -5,7 +5,46 @@
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
 
 @layer base {
+  :root {
+    --earth-bg: #FAFAF7;
+    --earth-text: #1A1A18;
+    --earth-sage: #5C6B4F;
+    --earth-tan: #8B7355;
+    --earth-border: #E5E2DB;
+    --earth-muted: #8A8680;
+    --earth-card: #FFFFFF;
+    --earth-input: #FFFFFF;
+  }
+
+  .dark {
+    --earth-bg: #1A1A18;
+    --earth-text: #E5E2DB;
+    --earth-sage: #7A8F6A;
+    --earth-tan: #A8916F;
+    --earth-border: #3A3835;
+    --earth-muted: #8A8680;
+    --earth-card: #252422;
+    --earth-input: #2A2826;
+  }
+
   body {
     @apply bg-earth-bg text-earth-text antialiased;
+    transition: background-color 0.2s, color 0.2s;
   }
+}
+
+@layer components {
+  .badge-easy { background: #E8EDE4; color: #4A5940; }
+  .badge-long-run { background: #EDE6DC; color: #6B5B45; }
+  .badge-workout { background: #E4E8DC; color: #5A6348; }
+  .badge-recovery { background: #EDE0DC; color: #7A5A50; }
+  .badge-race { background: #E0DED8; color: #5C5A52; }
+  .badge-other { background: #E8E6E2; color: #6A6860; }
+
+  .dark .badge-easy { background: #2E3528; color: #8FA87A; }
+  .dark .badge-long-run { background: #352F26; color: #A89470; }
+  .dark .badge-workout { background: #2E3226; color: #8A9470; }
+  .dark .badge-recovery { background: #352A26; color: #A87A6A; }
+  .dark .badge-race { background: #2E2D28; color: #9A9880; }
+  .dark .badge-other { background: #302F2C; color: #8A8878; }
 }
