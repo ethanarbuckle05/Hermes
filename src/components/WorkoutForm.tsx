@@ -50,14 +50,14 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
   }
 
   const inputClass =
-    "w-full px-3 py-2 border border-stone-300 rounded-lg text-sm bg-white " +
-    "focus:outline-none focus:ring-2 focus:ring-hermes-500/40 focus:border-hermes-500";
+    "w-full px-3 py-2 border border-earth-border rounded text-sm bg-white " +
+    "focus:outline-none focus:border-earth-text";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Date */}
       <div>
-        <label className="block text-xs font-medium text-stone-600 mb-1">Date</label>
+        <label className="block text-xs text-earth-muted mb-1.5">Date</label>
         <input
           type="date"
           value={form.date}
@@ -69,7 +69,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
 
       {/* Distance */}
       <div>
-        <label className="block text-xs font-medium text-stone-600 mb-1">Distance (miles)</label>
+        <label className="block text-xs text-earth-muted mb-1.5">Distance (miles)</label>
         <input
           type="number"
           step="0.01"
@@ -84,7 +84,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
 
       {/* Duration */}
       <div>
-        <label className="block text-xs font-medium text-stone-600 mb-1">Duration</label>
+        <label className="block text-xs text-earth-muted mb-1.5">Duration</label>
         <div className="flex gap-2">
           <div className="flex-1">
             <input
@@ -96,7 +96,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
               placeholder="min"
             />
           </div>
-          <span className="self-center text-stone-400 text-sm">:</span>
+          <span className="self-center text-earth-muted text-sm">:</span>
           <div className="flex-1">
             <input
               type="number"
@@ -113,17 +113,17 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
 
       {/* Type */}
       <div>
-        <label className="block text-xs font-medium text-stone-600 mb-1">Type</label>
+        <label className="block text-xs text-earth-muted mb-1.5">Type</label>
         <div className="flex flex-wrap gap-2">
           {TYPES.map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => set("workout_type", t)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
+              className={`px-3 py-1.5 text-xs rounded border transition-colors ${
                 form.workout_type === t
-                  ? "bg-hermes-600 text-white border-hermes-600"
-                  : "bg-white text-stone-600 border-stone-300 hover:border-stone-400"
+                  ? "bg-earth-sage text-white border-earth-sage"
+                  : "bg-white text-earth-muted border-earth-border hover:border-earth-tan"
               }`}
             >
               {WORKOUT_LABELS[t]}
@@ -134,7 +134,7 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
 
       {/* Notes */}
       <div>
-        <label className="block text-xs font-medium text-stone-600 mb-1">Notes</label>
+        <label className="block text-xs text-earth-muted mb-1.5">Notes</label>
         <textarea
           value={form.notes}
           onChange={(e) => set("notes", e.target.value)}
@@ -145,17 +145,17 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
       </div>
 
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+        <p className="text-sm text-red-700 bg-red-50/50 rounded px-3 py-2">{error}</p>
       )}
 
       {/* Actions */}
-      <div className="flex gap-2 pt-1">
+      <div className="flex gap-2 pt-2">
         {onCancel && (
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 py-2.5 text-sm font-medium text-stone-600 border border-stone-300
-                       rounded-lg hover:bg-stone-100 transition-colors"
+            className="flex-1 py-2.5 text-sm text-earth-muted border border-earth-border
+                       rounded hover:bg-earth-bg transition-colors"
           >
             Cancel
           </button>
@@ -163,8 +163,8 @@ export default function WorkoutForm({ initial, onSubmit, onCancel, submitLabel =
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 py-2.5 bg-hermes-600 text-white text-sm font-medium rounded-lg
-                     hover:bg-hermes-700 transition-colors disabled:opacity-50"
+          className="flex-1 py-2.5 bg-earth-sage text-white text-sm rounded
+                     hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           {loading ? "Saving..." : submitLabel}
         </button>

@@ -157,23 +157,23 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-20 text-center text-sm text-stone-400">
+      <div className="max-w-lg mx-auto px-4 py-20 text-center text-sm text-earth-muted">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6 pb-24">
+    <div className="max-w-lg mx-auto px-4 py-8 pb-24">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-hermes-600">Hermes</h1>
-          <p className="text-xs text-stone-400">{userEmail}</p>
+          <h1 className="text-2xl tracking-tight">Hermes</h1>
+          <p className="text-xs text-earth-muted mt-0.5">{userEmail}</p>
         </div>
         <button
           onClick={handleSignOut}
-          className="text-xs text-stone-400 hover:text-stone-600 transition-colors"
+          className="text-xs text-earth-muted hover:text-earth-text transition-colors"
         >
           Sign out
         </button>
@@ -188,15 +188,15 @@ export default function HomePage() {
           onDelete={handleDeleteRace}
         />
       ) : view === "add-race" ? (
-        <div className="bg-white border border-stone-200 rounded-xl p-4 mb-4">
-          <h2 className="text-sm font-semibold mb-3">Set target race</h2>
+        <div className="bg-earth-card border border-earth-border rounded-lg p-5 mb-5">
+          <h2 className="text-sm font-semibold mb-4">Set target race</h2>
           <RaceForm onSubmit={handleCreateRace} onCancel={() => setView("idle")} />
         </div>
       ) : (
         <button
           onClick={() => setView("add-race")}
-          className="w-full py-3 mb-4 border-2 border-dashed border-hermes-300 rounded-xl
-                     text-sm font-medium text-hermes-500 hover:border-hermes-500 hover:text-hermes-700
+          className="w-full py-3 mb-5 border border-dashed border-earth-border rounded-lg
+                     text-sm text-earth-muted hover:border-earth-sage hover:text-earth-sage
                      transition-colors"
         >
           + Set a target race
@@ -204,20 +204,20 @@ export default function HomePage() {
       )}
 
       {/* Weekly stats */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-white border border-stone-200 rounded-xl px-4 py-3">
-          <p className="text-[10px] uppercase tracking-wide text-stone-400 font-semibold">
+      <div className="grid grid-cols-2 gap-3 mb-5">
+        <div className="bg-earth-card border border-earth-border rounded-lg px-4 py-3">
+          <p className="text-[10px] uppercase tracking-widest text-earth-muted">
             7-day miles
           </p>
-          <p className="text-xl font-bold font-mono tabular-nums mt-0.5">
+          <p className="text-xl font-mono tabular-nums mt-1">
             {weekMiles.toFixed(1)}
           </p>
         </div>
-        <div className="bg-white border border-stone-200 rounded-xl px-4 py-3">
-          <p className="text-[10px] uppercase tracking-wide text-stone-400 font-semibold">
+        <div className="bg-earth-card border border-earth-border rounded-lg px-4 py-3">
+          <p className="text-[10px] uppercase tracking-widest text-earth-muted">
             7-day time
           </p>
-          <p className="text-xl font-bold font-mono tabular-nums mt-0.5">
+          <p className="text-xl font-mono tabular-nums mt-1">
             {formatDuration(weekTime)}
           </p>
         </div>
@@ -225,8 +225,8 @@ export default function HomePage() {
 
       {/* Add workout / form */}
       {view === "add-workout" ? (
-        <div className="bg-white border border-stone-200 rounded-xl p-4 mb-4">
-          <h2 className="text-sm font-semibold mb-3">Log workout</h2>
+        <div className="bg-earth-card border border-earth-border rounded-lg p-5 mb-5">
+          <h2 className="text-sm font-semibold mb-4">Log workout</h2>
           <WorkoutForm
             onSubmit={handleCreateWorkout}
             onCancel={() => setView("idle")}
@@ -234,8 +234,8 @@ export default function HomePage() {
           />
         </div>
       ) : view === "edit-workout" && editing ? (
-        <div className="bg-white border border-stone-200 rounded-xl p-4 mb-4">
-          <h2 className="text-sm font-semibold mb-3">Edit workout</h2>
+        <div className="bg-earth-card border border-earth-border rounded-lg p-5 mb-5">
+          <h2 className="text-sm font-semibold mb-4">Edit workout</h2>
           <WorkoutForm
             initial={{
               date: editing.date,
@@ -253,8 +253,8 @@ export default function HomePage() {
       ) : view !== "add-race" ? (
         <button
           onClick={() => setView("add-workout")}
-          className="w-full py-3 mb-4 border-2 border-dashed border-stone-300 rounded-xl
-                     text-sm font-medium text-stone-500 hover:border-hermes-400 hover:text-hermes-600
+          className="w-full py-3 mb-5 border border-dashed border-earth-border rounded-lg
+                     text-sm text-earth-muted hover:border-earth-sage hover:text-earth-sage
                      transition-colors"
         >
           + Log workout
@@ -263,9 +263,9 @@ export default function HomePage() {
 
       {/* Workout list */}
       {workouts.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-stone-400 text-sm">No workouts yet.</p>
-          <p className="text-stone-400 text-xs mt-1">Log your first run to get started.</p>
+        <div className="text-center py-16">
+          <p className="text-earth-muted text-sm">No workouts yet.</p>
+          <p className="text-earth-muted text-xs mt-1">Log your first run to get started.</p>
         </div>
       ) : (
         <div className="space-y-2">

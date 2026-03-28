@@ -49,19 +49,15 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm">
-        {/* Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-hermes-600">
-            Hermes
-          </h1>
-          <p className="text-stone-500 text-sm mt-1">Training log</p>
+      <div className="w-full max-w-xs">
+        <div className="text-center mb-12">
+          <h1 className="text-3xl tracking-tight">Hermes</h1>
+          <p className="text-earth-muted text-sm mt-2">Training log</p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-stone-600 mb-1">
+            <label htmlFor="email" className="block text-xs text-earth-muted mb-1.5">
               Email
             </label>
             <input
@@ -70,15 +66,14 @@ export default function LoginPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm
-                         focus:outline-none focus:ring-2 focus:ring-hermes-500/40 focus:border-hermes-500
-                         bg-white"
+              className="w-full px-3 py-2.5 border border-earth-border rounded text-sm
+                         focus:outline-none focus:border-earth-text bg-white"
               placeholder="you@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-xs font-medium text-stone-600 mb-1">
+            <label htmlFor="password" className="block text-xs text-earth-muted mb-1.5">
               Password
             </label>
             <input
@@ -88,35 +83,34 @@ export default function LoginPage() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm
-                         focus:outline-none focus:ring-2 focus:ring-hermes-500/40 focus:border-hermes-500
-                         bg-white"
+              className="w-full px-3 py-2.5 border border-earth-border rounded text-sm
+                         focus:outline-none focus:border-earth-text bg-white"
               placeholder="••••••••"
             />
           </div>
 
           {error && (
-            <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+            <p className="text-sm text-red-700 px-3 py-2 bg-red-50/50 rounded">{error}</p>
           )}
           {message && (
-            <p className="text-sm text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">{message}</p>
+            <p className="text-sm text-earth-sage px-3 py-2 bg-[#E8EDE4]/50 rounded">{message}</p>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-hermes-600 text-white text-sm font-medium rounded-lg
-                       hover:bg-hermes-700 transition-colors disabled:opacity-50"
+            className="w-full py-2.5 bg-earth-sage text-white text-sm rounded
+                       hover:opacity-90 transition-opacity disabled:opacity-50"
           >
             {loading ? "..." : mode === "login" ? "Log in" : "Sign up"}
           </button>
         </form>
 
-        <p className="text-center text-xs text-stone-500 mt-4">
+        <p className="text-center text-xs text-earth-muted mt-6">
           {mode === "login" ? "No account? " : "Already have an account? "}
           <button
             onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(""); setMessage(""); }}
-            className="text-hermes-600 font-medium hover:underline"
+            className="text-earth-text underline underline-offset-2"
           >
             {mode === "login" ? "Sign up" : "Log in"}
           </button>

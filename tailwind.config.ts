@@ -5,22 +5,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        hermes: {
-          50: "#fef7ee",
-          100: "#feedd6",
-          200: "#fbd7ad",
-          300: "#f8b978",
-          400: "#f49141",
-          500: "#f1741c",
-          600: "#e25a12",
-          700: "#bb4311",
-          800: "#953616",
-          900: "#782f15",
-          950: "#411509",
+        earth: {
+          bg: "#FAFAF7",
+          text: "#1A1A18",
+          sage: "#5C6B4F",
+          tan: "#8B7355",
+          border: "#E5E2DB",
+          muted: "#8A8680",
+          card: "#FFFFFF",
         },
       },
       fontFamily: {
-        sans: ['"DM Sans"', "system-ui", "sans-serif"],
+        sans: ["Georgia", "Times New Roman", "serif"],
         mono: ['"JetBrains Mono"', "monospace"],
       },
     },

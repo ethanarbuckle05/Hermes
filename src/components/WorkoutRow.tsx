@@ -24,16 +24,16 @@ export default function WorkoutRow({ workout, onEdit, onDelete }: Props) {
   }
 
   return (
-    <div className="group bg-white border border-stone-200 rounded-xl px-4 py-3 hover:border-stone-300 transition-colors">
+    <div className="group bg-earth-card border border-earth-border rounded-lg px-4 py-3 hover:border-earth-tan/40 transition-colors">
       <div className="flex items-start justify-between gap-3">
         {/* Left: main info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs text-stone-500 font-medium">
+            <span className="text-xs text-earth-muted">
               {formatDate(workout.date)}
             </span>
             <span
-              className={`inline-block px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase tracking-wide ${
+              className={`inline-block px-2 py-0.5 text-[10px] font-medium rounded uppercase tracking-wide ${
                 WORKOUT_COLORS[workout.workout_type]
               }`}
             >
@@ -43,19 +43,19 @@ export default function WorkoutRow({ workout, onEdit, onDelete }: Props) {
 
           {/* Stats row */}
           <div className="flex items-baseline gap-4">
-            <span className="text-lg font-semibold tabular-nums font-mono">
-              {workout.distance_miles} <span className="text-xs font-sans text-stone-400">mi</span>
+            <span className="text-lg tabular-nums font-mono">
+              {workout.distance_miles} <span className="text-xs font-sans text-earth-muted">mi</span>
             </span>
-            <span className="text-sm text-stone-600 tabular-nums font-mono">
+            <span className="text-sm text-earth-muted tabular-nums font-mono">
               {formatDuration(workout.duration_seconds)}
             </span>
-            <span className="text-sm text-stone-500 tabular-nums font-mono">
+            <span className="text-sm text-earth-muted tabular-nums font-mono">
               {formatPace(workout.distance_miles, workout.duration_seconds)}
             </span>
           </div>
 
           {workout.notes && (
-            <p className="text-xs text-stone-500 mt-1.5 line-clamp-2">{workout.notes}</p>
+            <p className="text-xs text-earth-muted mt-1.5 line-clamp-2">{workout.notes}</p>
           )}
         </div>
 
@@ -63,7 +63,7 @@ export default function WorkoutRow({ workout, onEdit, onDelete }: Props) {
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 pt-1">
           <button
             onClick={() => onEdit(workout)}
-            className="p-1.5 text-stone-400 hover:text-hermes-600 hover:bg-hermes-50 rounded-md transition-colors"
+            className="p-1.5 text-earth-muted hover:text-earth-sage rounded transition-colors"
             title="Edit"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -74,10 +74,10 @@ export default function WorkoutRow({ workout, onEdit, onDelete }: Props) {
             onClick={handleDelete}
             onBlur={() => { setConfirming(false); }}
             disabled={deleting}
-            className={`p-1.5 rounded-md transition-colors ${
+            className={`p-1.5 rounded transition-colors ${
               confirming
-                ? "text-red-600 bg-red-50 hover:bg-red-100"
-                : "text-stone-400 hover:text-red-600 hover:bg-red-50"
+                ? "text-red-700 bg-red-50/50"
+                : "text-earth-muted hover:text-red-700"
             }`}
             title={confirming ? "Click again to confirm" : "Delete"}
           >
